@@ -1,7 +1,7 @@
 import time
 import random
 from main.pages.base_page import BasePage
-from main.selectors.elements_page_locators import TextBoxPageLocators, CheckBoxPageLocators
+from main.selectors.elements_page_locators import TextBoxPageLocators, CheckBoxPageLocators, RadioButtonLocators
 from main.generator.generator import generated_person
 from selenium.webdriver.common.by import By
 
@@ -51,7 +51,7 @@ class CheckBoxPage(BasePage):
         checked_list = self.elements_are_exist(self.locators.CHECKED_CHECKBOX)
         data = []
         for box in checked_list:
-            title = box.find_element(By.XPATH,self.locators.ITEM_TITLE)
+            title = box.find_element(By.XPATH, self.locators.ITEM_TITLE)
             data.append(title.text)
         return str(data).replace(" ", "").replace(".doc", "").lower()
 
@@ -60,6 +60,19 @@ class CheckBoxPage(BasePage):
         output_data = []
         for output_title in output_list:
             output_data.append(output_title.text)
-        return str(output_data).replace(" ","").lower()
+        return str(output_data).replace(" ", "").lower()
 
 
+class RadioButtonPage(BasePage):
+    locators = RadioButtonLocators()
+
+    def click_on_button_and_check(self, radio_button):
+        choices = {
+            "yes": self.locators.YES_RADIO_BUTTON,
+            "no": self.locators.NO_RADIO_BUTTON,
+            "impressive": self.locators.IMPRESSIVE_RADIO_BUTTON
+        }
+        el = self.element_is_visible(choices[radio_button])
+        el.click()
+        selected_buttons_name = self.element_exists(self.locators.OUTPUT_RESULT).text
+        return selected_buttons_name.lower()

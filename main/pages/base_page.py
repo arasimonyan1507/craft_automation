@@ -13,7 +13,7 @@ class BasePage:
     def open(self):
         self.driver.get(self.url)
 
-    def element_is_visible(self, selector, timeout=10):
+    def element_is_visible(self, selector, timeout=20):
         return wait(self.driver, timeout).until(EC.visibility_of_element_located(selector))
 
     def elements_are_visible(self,selector,timeout=10):
@@ -30,7 +30,6 @@ class BasePage:
 
     def find_and_click(self, selector):
         self.driver.find_element(selector[0],selector[1]).click()
-
 
     def scroll_to_element(self, selector):
         # self.driver.find_element(selector).send_keys(Keys.PAGE_DOWN)
