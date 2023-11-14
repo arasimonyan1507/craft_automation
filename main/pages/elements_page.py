@@ -1,8 +1,9 @@
 import time
 import random
 from main.pages.base_page import BasePage
-from main.selectors.elements_page_locators import TextBoxPageLocators, CheckBoxPageLocators, RadioButtonLocators
-from main.generator.generator import generated_person
+from main.selectors.elements_page_locators import TextBoxPageLocators, CheckBoxPageLocators, RadioButtonPageLocators, \
+    WebTablesPageLocators
+from main.generator.generator import generated_person, generated_registration_form
 from selenium.webdriver.common.by import By
 
 
@@ -64,7 +65,7 @@ class CheckBoxPage(BasePage):
 
 
 class RadioButtonPage(BasePage):
-    locators = RadioButtonLocators()
+    locators = RadioButtonPageLocators()
 
     def click_on_button_and_check(self, radio_button):
         choices = {
@@ -76,3 +77,99 @@ class RadioButtonPage(BasePage):
         el.click()
         selected_buttons_name = self.element_exists(self.locators.OUTPUT_RESULT).text
         return selected_buttons_name.lower()
+    
+
+
+
+class WebTablesPage(BasePage):
+    locators = WebTablesPageLocators()
+
+    def add_new_person(self, count=1):
+        while count:
+            reg_form = next(generated_registration_form())
+            first_name = reg_form.first_name
+            last_name = reg_form.last_name
+            email = reg_form.email
+            age = str(reg_form.age)
+            salary = str(reg_form.salary)
+            department = reg_form.department
+            self.element_is_visible(self.locators.ADD_BUTTON).click()
+            self.element_is_visible(self.locators.FIRST_NAME_INPUT).send_keys(first_name)
+            self.element_is_visible(self.locators.LAST_NAME_INPUT).send_keys(last_name)
+            self.element_is_visible(self.locators.EMAIL_INPUT).send_keys(email)
+            self.element_is_visible(self.locators.AGE_INPUT).send_keys(age)
+            self.element_is_visible(self.locators.SALARY_INPUT).send_keys(salary)
+            self.element_is_visible(self.locators.DEPARTMENT_INPUT).send_keys(department)
+            self.element_is_visible(self.locators.SUBMIT_BUTTON).click()
+            count -= 1
+            return [first_name, last_name, age, email, salary, department]
+
+    def get_list_of_people(self):
+        people_list = self.elements_are_exist(self.locators.PEOPLE_LIST)
+        people_data = []
+        for person in people_list:
+            people_data.append(person.text.splitlines())
+        return people_data
+
+    def check_new_added_person(self):
+        list_of_people = self.elements_are_exist(self.locators.PEOPLE_LIST)
+        people_data = []
+        for el in list_of_people:
+            people_data.append(el.text.splitlines())
+        return people_data
+
+    def search_person(self, key_word):
+        search_field = self.element_is_visible(self.locators.SEARCH_FIELD)
+        search_field.send_keys(key_word)
+        return search_field
+
+    def check_search_person(self):
+        delete_button = self.element_is_visible(self.locators.DELETE_BUTTON)
+        rows = delete_button.find_element(By.XPATH, self.locators.PARENT_ROW)
+        return rows.text.splitlines()
+
+    def update_person(self):
+        new_person_info = next(generated_registration_form())
+        new_email = new_person_info.email
+        self.element_is_visible(self.locators.EDIT_BUTTON).click()
+        email_input = self.element_is_visible(self.locators.EMAIL_INPUT)
+        email_input.clear()
+        email_input.send_keys(new_email)
+        self.element_is_visible(self.locators.SUBMIT_BUTTON).click()
+        return new_email
+
+    def delete_person(self):
+        self.element_is_visible(self.locators.DELETE_BUTTON).click()
+
+    def check_person_is_deleted(self):
+        rows_not_found = self.element_is_visible(self.locators.ROWS_NO_FOUND)
+        return rows_not_found.text
+
+    def change_count_of_rows(self):
+        list_of_count_rows = [5, 10, 20, 25]
+        data = []
+        for x in list_of_count_rows:
+            row_dropdown = self.element_exists(self.locators.ROWS_DROPDOWN)
+            self.scroll_to_element(row_dropdown)
+            row_dropdown.click()
+            count_row = self.element_is_visible((By.CSS_SELECTOR, f'span.select-wrap.-pageSizeOptions>select>option['
+                                                                  f'value="{x}"]'))
+            count_row.click()
+            data.append(self.check_count_of_rows_is_changed())
+        return data
+
+    def check_count_of_rows_is_changed(self):
+        list_of_people = self.elements_are_exist(self.locators.PEOPLE_LIST)
+        return len(list_of_people)
+
+
+
+
+
+
+
+
+
+
+
+

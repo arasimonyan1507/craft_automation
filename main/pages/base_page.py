@@ -34,3 +34,7 @@ class BasePage:
     def scroll_to_element(self, selector):
         # self.driver.find_element(selector).send_keys(Keys.PAGE_DOWN)
         self.driver.execute_script("arguments[0].scrollIntoView();", selector)
+
+    def element_is_invisible(self, selector, timeout=10):
+        return wait(self.driver, timeout).until(EC.invisibility_of_element(selector))
+
