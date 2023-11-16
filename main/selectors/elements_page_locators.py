@@ -47,11 +47,31 @@ class WebTablesPageLocators:
     EDIT_BUTTON = (By.CSS_SELECTOR, 'span[title="Edit"]')
     ROWS_NO_FOUND = (By.CSS_SELECTOR, 'div.rt-noData')
     ROWS_DROPDOWN = (By.CSS_SELECTOR, 'span.select-wrap.-pageSizeOptions')
-    ROWS_5 = (By.CSS_SELECTOR, 'span.select-wrap.-pageSizeOptions>select>option[value="5"]')
-    ROWS_10 = (By.CSS_SELECTOR, 'span.select-wrap.-pageSizeOptions>select>option[value="10"]')
-    ROWS_20 = (By.CSS_SELECTOR, 'span.select-wrap.-pageSizeOptions>select>option[value="20"]')
 
 
+class ButtonsPageLocators:
+    DOUBLE_CLICK_BUTTON = (By.CSS_SELECTOR, "#doubleClickBtn")
+    RIGHT_CLICK_BUTTON = (By.CSS_SELECTOR, '#rightClickBtn')
+    CLICK_BUTTON = (By.XPATH, '//div[3]/button')
+    DOUBLE_CLICK_MESSAGE = (By.CSS_SELECTOR, "#doubleClickMessage")
+    RIGHT_CLICK_MESSAGE = (By.CSS_SELECTOR, '#rightClickMessage')
+    CLICK_MESSAGE = (By.CSS_SELECTOR, '#dynamicClickMessage')
 
+
+class LinksPageLocators:
+    HOME_LINK = (By.CSS_SELECTOR, '#simpleLink')
+    BAD_REQUEST = (By.CSS_SELECTOR, "#bad-request")
+
+
+class UploadAndDownloadPageLocators:
+    DOWNLOAD_BUTTON = (By.CSS_SELECTOR, "#downloadButton")
+    UPLOAD_BUTTON = (By.CSS_SELECTOR, "#uploadFile")
+    UPLOADED_FILE_PATH = (By.CSS_SELECTOR, "#uploadedFilePath")
+
+
+class DynamicPropertiesLocators:
+    CHANGE_COLOR = (By.CSS_SELECTOR, "#colorChange")
+    VISIBLE_AFTER_5_SECONDS = (By.CSS_SELECTOR, "#visibleAfter")
+    ENABLE_AFTER_5_SEC = (By.CSS_SELECTOR, "#enableAfter")
 
 

@@ -1,10 +1,17 @@
 import time
 import random
+
+from selenium.common import TimeoutException
+
 from main.pages.base_page import BasePage
 from main.selectors.elements_page_locators import TextBoxPageLocators, CheckBoxPageLocators, RadioButtonPageLocators, \
-    WebTablesPageLocators
-from main.generator.generator import generated_person, generated_registration_form
+    WebTablesPageLocators, ButtonsPageLocators, LinksPageLocators, UploadAndDownloadPageLocators, \
+    DynamicPropertiesLocators
+from main.generator.generator import generated_person, generated_registration_form, generated_file
 from selenium.webdriver.common.by import By
+import requests
+from pathlib import Path
+import base64
 
 
 class TextBoxPage(BasePage):
@@ -77,8 +84,6 @@ class RadioButtonPage(BasePage):
         el.click()
         selected_buttons_name = self.element_exists(self.locators.OUTPUT_RESULT).text
         return selected_buttons_name.lower()
-    
-
 
 
 class WebTablesPage(BasePage):
@@ -163,13 +168,93 @@ class WebTablesPage(BasePage):
         return len(list_of_people)
 
 
+class ButtonsPage(BasePage):
+    locators = ButtonsPageLocators()
+
+    def click_on_different_buttons(self, click_type):
+        if click_type == "double":
+            self.action_double_click(self.element_is_visible(self.locators.DOUBLE_CLICK_BUTTON))
+            return self.check_click_message(self.locators.DOUBLE_CLICK_MESSAGE)
+        if click_type == "right":
+            self.action_right_click(self.element_is_visible(self.locators.RIGHT_CLICK_BUTTON))
+            return self.check_click_message(self.locators.RIGHT_CLICK_MESSAGE)
+        if click_type == "click":
+            self.action_click_on_element(self.element_is_visible(self.locators.CLICK_BUTTON))
+            return self.check_click_message(self.locators.CLICK_MESSAGE)
+
+    def check_click_message(self, click_type):
+        return self.element_exists(click_type).text
 
 
+class LinksPage(BasePage):
+    locators = LinksPageLocators()
+
+    def check_home_link(self):
+        home_link = self.element_is_visible(self.locators.HOME_LINK)
+        href_link = home_link.get_attribute("href")
+        request = requests.get(href_link)
+        if request.status_code == 200:
+            home_link.click()
+            # switch to second tab
+            self.driver.switch_to.window(self.driver.window_handles[1])
+            current_url = self.driver.current_url
+            return href_link, current_url
+        else:
+            return request.status_code
+
+    def check_bad_request(self, url):
+        request = requests.get(url)
+        if request.status_code == 200:
+            self.element_exists(self.locators.BAD_REQUEST).click()
+        else:
+            return request.status_code
 
 
+class UploadAndDownloadPage(BasePage):
+    locators = UploadAndDownloadPageLocators()
+
+    def upload_file(self):
+        file_name, file_path = generated_file()
+        upload_button = self.element_exists(self.locators.UPLOAD_BUTTON)
+        upload_button.send_keys(file_path)
+        Path.unlink(file_path)
+        uploaded_file_path = self.element_is_visible(self.locators.UPLOADED_FILE_PATH).text
+        return file_name, uploaded_file_path
+
+    def download_file(self):
+        href_link = self.element_is_visible(self.locators.DOWNLOAD_BUTTON).get_attribute("href")
+        image_part_in_href_link = href_link.split(",")[1]
+        # jpeg image is encoded in href link, needed to decode only part of image
+        decoded_jpeg = base64.b64decode(image_part_in_href_link)
+        downloaded_jpg_path = Path(r"C:\Users\araga\PycharmProjects\craft_automation\main\pages\downloaded_image.jpg")
+        # write image as a binary data(sequence of bytes)
+        with open(downloaded_jpg_path, "wb+") as file:
+            file.write(decoded_jpeg)
+            check_file_is_downloaded = downloaded_jpg_path.exists()
+        downloaded_jpg_path.unlink()
+        return check_file_is_downloaded
 
 
+class DynamicPropertiesPage(BasePage):
+    locators = DynamicPropertiesLocators()
 
+    def change_color(self):
+        color_change = self.element_exists(self.locators.CHANGE_COLOR)
+        color_before_changing = color_change.value_of_css_property("color")
+        time.sleep(5)
+        color_after_changing = color_change.value_of_css_property("color")
+        return color_before_changing, color_after_changing
 
+    def check_visibility_after_5_sec(self):
+        try:
+            self.element_is_visible(self.locators.VISIBLE_AFTER_5_SECONDS, 7)
+        except TimeoutException:
+            return False
+        return True
 
-
+    def check_element_is_clickable(self):
+        try:
+            self.element_is_clickable(self.locators.ENABLE_AFTER_5_SEC, 5)
+        except TimeoutException:
+            return False
+        return True
