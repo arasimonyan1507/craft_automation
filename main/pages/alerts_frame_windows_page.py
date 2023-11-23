@@ -4,7 +4,8 @@ from selenium.common import UnexpectedAlertPresentException
 
 from main.generator.generator import generated_person
 from main.pages.base_page import BasePage
-from main.selectors.alerts_frames_windows_page_locators import BrowserWindowsPageLocators, AlertsPageLocators
+from main.selectors.alerts_frames_windows_page_locators import BrowserWindowsPageLocators, AlertsPageLocators, \
+    FramesPageLocators, NestedFramePageLocators, ModalDialogsPageLocators
 
 
 class BrowserWindowsPage(BasePage):
@@ -54,3 +55,61 @@ class AlertsPage(BasePage):
         alert_window.accept()
         returned_message = self.element_is_visible(self.locators.RESULT_AFTER_PROMPT).text
         return random_name, returned_message
+
+
+# a "frame" refers to an HTML element or construct that allows web developers to divide a browser window into
+# multiple sections, each capable of displaying its own HTML document
+class FramesPage(BasePage):
+    locators = FramesPageLocators()
+
+    def check_frame(self, frame_name):
+        if frame_name == "frame1":
+            first_frame = self.element_exists(self.locators.FIRST_FRAME)
+            self.scroll_to_element(first_frame)
+            width = first_frame.get_attribute("width")
+            height = first_frame.get_attribute("height")
+            self.switch_to_frame(first_frame)
+            text = self.element_exists(self.locators.FRAME_H1_TITLE).text
+            return text, width, height
+        elif frame_name == "frame2":
+            second_frame = self.element_exists(self.locators.SECOND_FRAME)
+            self.scroll_to_element(second_frame)
+            width = second_frame.get_attribute("width")
+            height = second_frame.get_attribute("height")
+            self.switch_to_frame(second_frame)
+            text = self.element_exists(self.locators.FRAME_H1_TITLE).text
+            return text, width, height
+
+
+class NestedFramesPage(BasePage):
+    locators = NestedFramePageLocators()
+
+    def check_parent_frame(self):
+        parent_frame = self.element_is_visible(self.locators.PARENT_FRAME)
+        self.switch_to_frame(parent_frame)
+        parent_text = self.element_exists(self.locators.PARENT_FRAME_TEXT).text
+        child_frame = self.element_exists(self.locators.CHILD_FRAME)
+        self.switch_to_frame(child_frame)
+        child_text = self.element_is_visible(self.locators.CHILD_FRAME_TEXT).text
+        return parent_text, child_text
+
+
+class ModalDialogsPage(BasePage):
+    locators = ModalDialogsPageLocators()
+
+    def check_small_modal(self):
+        self.element_is_visible(self.locators.SMALL_MODAL_BUTTON).click()
+        modal_title = self.element_is_visible(self.locators.SMALL_MODAL_TITLE).text
+        self.element_is_visible(self.locators.X_BUTTON)
+        modal_text = self.element_is_visible(self.locators.SMALL_MODAL_TEXT).text
+        self.element_is_visible(self.locators.SMALL_MODAL_CLOSE_BUTTON)
+        return modal_title, modal_text
+
+    def check_large_modal(self):
+        self.element_is_visible(self.locators.LARGE_MODAL_BUTTON).click()
+        modal_title = self.element_is_visible(self.locators.LARGE_MODAL_TITLE).text
+        self.element_is_visible(self.locators.X_BUTTON)
+        modal_text = self.element_is_visible(self.locators.LARGE_MODAL_TEXT).text
+        self.element_is_visible(self.locators.LARGE_MODAL_CLOSE_BUTTON)
+        return modal_title, modal_text
+

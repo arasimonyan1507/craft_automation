@@ -1,5 +1,4 @@
 import time
-
 from webdriver_manager.chrome import ChromeDriverManager
 import pytest
 from selenium.webdriver.chrome.service import Service as ChromeService
@@ -7,12 +6,13 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium import webdriver
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def drive():
-    driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
+    service = ChromeService(ChromeDriverManager().install())
+    driver = webdriver.Chrome(service=service)
     driver.maximize_window()
     yield driver
-    driver.quit()
+    driver.close()
 
 
 @pytest.fixture(scope="function")
