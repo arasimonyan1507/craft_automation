@@ -1,5 +1,6 @@
 import random
 
+import allure
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.wait import WebDriverWait as wait
 from selenium.webdriver.support import expected_conditions as EC
@@ -14,13 +15,9 @@ class BasePage:
         self.driver = driver
         self.url = url
 
+    @allure.step("Open the url")
     def open(self):
-        try:
-            self.driver.get(self.url)
-        except Exception as error:
-            print("here is the error")
-            print(error)
-            raise TypeError
+        self.driver.get(self.url)
 
     def element_is_visible(self, selector, timeout=20):
         return wait(self.driver, timeout).until(EC.visibility_of_element_located(selector))
@@ -38,7 +35,7 @@ class BasePage:
         return wait(self.driver, timeout).until(EC.presence_of_all_elements_located(selector))
 
     def find_and_click(self, selector):
-        self.driver.find_element(selector[0],selector[1]).click()
+        self.driver.find_element(selector[0], selector[1]).click()
 
     def scroll_to_element(self, selector):
         # self.driver.find_element(selector).send_keys(Keys.PAGE_DOWN)
@@ -89,6 +86,18 @@ class BasePage:
         action = ActionChains(self.driver)
         action.move_to_element(element)
         action.perform()
+
+    def drag_and_drop_to_element(self, what, where):
+        action = ActionChains(self.driver)
+        action.drag_and_drop(what, where)
+        action.perform()
+
+    def drag_and_drop_by_offset(self, element, x, y):
+        action = ActionChains(self.driver)
+        action.drag_and_drop_by_offset(element, x, y)
+        action.perform()
+
+
 
 
 

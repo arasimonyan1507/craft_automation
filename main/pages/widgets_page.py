@@ -2,10 +2,11 @@ import time
 
 import selenium.webdriver.support.relative_locator
 
-from main.generator.generator import generated_color, generated_date
+from main.generator.generator import generated_color, generated_date, generated_color_for_old_style, generated_car
 from main.pages.base_page import BasePage
 from main.selectors.widgets_page_locators import AccordianPageLocators, AutoCompletePageLocators, \
-    DatePickerPageLocators, SlidersPageLocators, ProgressBarPageLocators, TabsPageLocators, ToolTipsPageLocators
+    DatePickerPageLocators, SlidersPageLocators, ProgressBarPageLocators, TabsPageLocators, ToolTipsPageLocators, \
+    MenuPageLocators, SelectMenuPageLocators
 from selenium.webdriver.common.by import By
 import pytest
 import random
@@ -61,6 +62,7 @@ class AutoCompletePage(BasePage):
         delete_buttons = self.elements_are_exist(self.locators.DELETE_EXACT_COLOR_BUTTON)
         for delete in delete_buttons:
             delete.click()
+            time.sleep(1)
             break
         selected_list = self.elements_are_exist(self.locators.SELECTED_LIST_OF_COLORS)
         colors_after_deleting = []
@@ -210,22 +212,113 @@ class TabsPage(BasePage):
 class ToolTipsPage(BasePage):
     locators = ToolTipsPageLocators()
 
-    def check_hover_texts(self, el_to_hover="button"):
-        elements = {
-            "button": {"el": self.locators.BUTTON_TO_HOVER,
-                       "text": "You hovered over the Button"},
-            "input": {"el": self.locators.INPUT_TO_HOVER,
-                      "text": "You hovered over the text field"},
-            "word": {"el": self.locators.WORD_TO_HOVER,
-                     "text": "You hovered over the Contrary"},
-            "int": {"el": self.locators.INT_TO_HOVER,
-                    "text": "You hovered over the 1.10.32"}
-        }
-        page_title = self.element_exists(self.locators.TITLE_OF_PAGE)
-        element_to_hover = self.element_exists(elements[el_to_hover]["el"])
+    def get_hover_text_of_element(self, element, wait_element):
+        element_to_hover = self.element_exists(element)
         self.scroll_to_element(element_to_hover)
         self.hover_on_element(element_to_hover)
-        actual_text = self.element_exists(self.locators.TEXT_AFTER_HOVERING).text
-        self.scroll_to_element(page_title)
-        self.hover_on_element(page_title)
-        return actual_text, elements[el_to_hover]["text"]
+        self.element_is_visible(wait_element)
+        time.sleep(1)
+        text = self.element_is_visible(self.locators.TEXT_AFTER_HOVERING).text
+        return text
+
+    def get_hover_texts(self):
+        button_text = self.get_hover_text_of_element(self.locators.BUTTON_TO_HOVER, self.locators.BUTTON_TOOLTIP)
+        input_field_text = self.get_hover_text_of_element(self.locators.INPUT_TO_HOVER, self.locators.INPUT_TOOLTIP)
+        word_text = self.get_hover_text_of_element(self.locators.WORD_TO_HOVER, self.locators.WORD_TOOLTIP)
+        integer_text = self.get_hover_text_of_element(self.locators.INT_TO_HOVER, self.locators.INT_TOOLTIP)
+        return button_text, input_field_text, word_text, integer_text
+
+    # def check_hover_texts(self, element_name="button"):
+    #     elements = {
+    #         "button": {"el": self.locators.BUTTON_TO_HOVER,
+    #                    "text": "You hovered over the Button",
+    #                    "wait_to": self.locators.BUTTON_TOOLTIP},
+    #         "input": {"el": self.locators.INPUT_TO_HOVER,
+    #                   "text": "You hovered over the text field",
+    #                   "wait_to":self.locators.INPUT_TOOLTIP},
+    #         "word": {"el": self.locators.WORD_TO_HOVER,
+    #                  "text": "You hovered over the Contrary",
+    #                  "wait_to": self.locators.WORD_TOOLTIP
+    #                  },
+    #         "int": {"el": self.locators.INT_TO_HOVER,
+    #                 "text": "You hovered over the 1.10.32",
+    #                 "wait_to": self.locators.INT_TOOLTIP
+    #                 }
+    #     }
+    #     element_to_hover = self.element_exists(elements[element_name]["el"])
+    #     self.scroll_to_element(element_to_hover)
+    #     self.hover_on_element(element_to_hover)
+    #     self.element_is_visible(elements[element_name]["wait_to"])
+    #     time.sleep(1)
+    #     text = self.element_exists(self.locators.TEXT_AFTER_HOVERING).text
+    #     return text, elements[element_name]["text"]
+
+
+class MenuPage(BasePage):
+    locators = MenuPageLocators()
+
+    def check_menu_titles(self):
+        menu_list = self.elements_are_exist(self.locators.MENU_TITLES_LIST)
+        self.hover_on_element(menu_list[1])
+        self.hover_on_element(menu_list[4])
+        titles_list = []
+        for el in menu_list:
+            titles_list.append(el.text)
+        return titles_list
+
+
+class SelectMenuPage(BasePage):
+    locators = SelectMenuPageLocators()
+
+    def select_value(self):
+        select_value = self.element_exists(self.locators.SELECT_VALUE)
+        select_value.click()
+        list_of_values = self.elements_are_exist(self.locators.SELECT_VALUE_LIST)
+        random_value = list_of_values[random.randint(0, len(list_of_values)-1)]
+        random_value_title = random_value.text
+        self.scroll_to_element(random_value)
+        random_value.click()
+        selected_value = self.element_exists(self.locators.SELECTED_VALUE).text
+        return random_value_title, selected_value
+
+    def select_one(self):
+        select_one = self.element_is_visible(self.locators.SELECT_ONE)
+        select_one.click()
+        select_one_value_list = self.elements_are_exist(self.locators.SELECT_ONE_LIST)
+        random_value = select_one_value_list[random.randint(0, len(select_one_value_list)-1)]
+        self.scroll_to_element(random_value)
+        random_value_title = random_value.text
+        random_value.click()
+        selected_value = self.element_exists(self.locators.SELECTED_ONE_VALUE).text
+        return random_value_title, selected_value
+
+    # def select_old_style_value(self, color=generated_color_for_old_style()):
+    #     self.select_by_text(self.locators.OLD_STYLE_SELECT_VALUE, color)
+    #     print(color)
+    #     time.sleep(5)
+
+    def select_multiselect_dropdown(self):
+        dropdown = self.element_exists(self.locators.MULTISELECT_DROPDOWN)
+        self.scroll_to_element(dropdown)
+        dropdown.click()
+        amount = random.randint(1, 4)
+        colors_input = []
+        colors_output = []
+        while amount:
+            values_list = self.elements_are_exist(self.locators.LIST_FROM_MULTISELECT)
+            random_value = values_list[random.randint(0, len(values_list)-1)]
+            colors_input.append(random_value.text)
+            random_value.click()
+            amount -= 1
+        selected_colors = self.elements_are_exist(self.locators.LIST_OF_SELECTED_MULTIVALUES)
+        for el in selected_colors:
+            colors_output.append(el.text)
+        return colors_input, colors_output
+
+    def delete_multivalues(self):
+        delete = self.element_exists(self.locators.DELETE_MULTIVALUES_BUTTON)
+        delete.click()
+        return self.element_is_invisible(self.locators.LIST_OF_SELECTED_MULTIVALUES)
+
+    def standard_select(self, car=generated_car()):
+        self.select_by_text(self.locators.STANDARD_MULTISELECT, car)

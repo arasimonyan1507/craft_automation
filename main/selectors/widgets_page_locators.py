@@ -63,8 +63,34 @@ class TabsPageLocators:
 
 class ToolTipsPageLocators:
     BUTTON_TO_HOVER = (By.CSS_SELECTOR, "button#toolTipButton")
+    BUTTON_TOOLTIP = (By.CSS_SELECTOR, "#buttonToolTip")
     INPUT_TO_HOVER = (By.CSS_SELECTOR, "input#toolTipTextField")
+    INPUT_TOOLTIP = (By.CSS_SELECTOR, "#textFieldToolTip")
     WORD_TO_HOVER = (By.CSS_SELECTOR, "#texToolTopContainer.mt-4>a:first-of-type")
+    WORD_TOOLTIP = (By.CSS_SELECTOR, "#contraryTexToolTip")
     INT_TO_HOVER = (By.CSS_SELECTOR, "#texToolTopContainer.mt-4>a:last-of-type")
+    INT_TOOLTIP = (By.CSS_SELECTOR, "#sectionToolTip")
     TEXT_AFTER_HOVERING = (By.CSS_SELECTOR, "div.tooltip-inner")
     TITLE_OF_PAGE = (By.CSS_SELECTOR, "#buttonToolTopContainer>P")
+
+
+class MenuPageLocators:
+    MENU_TITLES_LIST = (By.CSS_SELECTOR, "ul#nav>li a")
+
+
+class SelectMenuPageLocators:
+    SELECT_VALUE_LIST = (By.CSS_SELECTOR, 'div[id^="react-select"]')
+    SELECT_VALUE = (By.CSS_SELECTOR, "#withOptGroup>div>div.css-1hwfws3>div")
+    SELECT_ONE_LIST = (By.CSS_SELECTOR, "div.css-yt9ioa-option")
+    SELECT_ONE = (By.CSS_SELECTOR, "#selectOne>div>div.css-1hwfws3")
+    SELECTED_VALUE = (By.CSS_SELECTOR, "#withOptGroup>div>div>div.css-1uccc91-singleValue")
+    SELECTED_ONE_VALUE = (By.CSS_SELECTOR, "#selectOne>div>div>div.css-1uccc91-singleValue")
+    OLD_STYLE_SELECT_VALUE = (By.CSS_SELECTOR, 'select[id = "oldSelectMenu"]')
+    MULTISELECT_DROPDOWN = (By.CSS_SELECTOR, '#selectMenuContainer > div:nth-child(7) > div > div > div > div.css-1hwfws3')
+    LIST_FROM_MULTISELECT = (By.CSS_SELECTOR, 'div[id^="react-select-4-option"]')
+    LIST_OF_SELECTED_MULTIVALUES = (By.CSS_SELECTOR, "div.css-1rhbuit-multiValue>div.css-12jo7m5")
+    DELETE_MULTIVALUES_BUTTON = (By.CSS_SELECTOR, 'div.css-1wy0on6 > div:nth-child(1)')
+    STANDARD_MULTISELECT = (By.CSS_SELECTOR, '#cars')
+
+
+

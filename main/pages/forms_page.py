@@ -2,6 +2,7 @@ import random
 import time
 from pathlib import Path
 
+import allure
 from selenium.webdriver import Keys
 from selenium.webdriver.common.by import By
 from main.pages.base_page import BasePage
@@ -19,10 +20,10 @@ class PracticeFormPage(BasePage):
         email = student_data.email
         phone_number = student_data.phone_number[0:10]
         file_name, file_path = generated_file()
-        Path.unlink(file_path)
         self.element_is_visible(self.locators.FIRST_NAME_FIELD).send_keys(first_name)
         self.element_is_visible(self.locators.LAST_NAME_FIELD).send_keys(last_name)
         self.element_is_visible(self.locators.EMAIL_FIELD).send_keys(email)
+        self.remove_footer(self.locators.FOOTER)
         self.element_exists(self.locators.GENDER).click()
         self.element_is_visible(self.locators.MOBILE_NUMBER_FIELD).send_keys(phone_number)
         subjects = self.choose_subjects()
@@ -31,16 +32,18 @@ class PracticeFormPage(BasePage):
         self.scroll_to_element(self.element_exists(self.locators.STATE_DROPDOWN))
         self.element_is_visible(self.locators.STATE_DROPDOWN).click()
         self.element_is_visible(self.locators.STATE_NAME).click()
-        self.element_is_visible(self.locators.CITY_DROPDOWN).click()
-        self.element_is_visible(self.locators.CITY_NAME).click()
+        # city name dropdown is not clickable
+        # self.element_is_visible(self.locators.CITY_DROPDOWN).click()
+        # self.element_is_visible(self.locators.CITY_NAME).click()
         # zoom - for submit button to be visible
         zoom_level = [0.5, 1]
         self.driver.execute_script(f"document.body.style.zoom = '{zoom_level[0]}';")
         self.scroll_to_element(self.element_exists(self.locators.SUBMIT))
         button = self.element_exists(self.locators.SUBMIT)
         button.send_keys(Keys.RETURN)
+        Path.unlink(file_path)
         self.driver.execute_script(f"document.body.style.zoom = '{zoom_level[1]}';")
-        return [first_name+" "+last_name, email, phone_number, subjects, hobbies]
+        return [first_name+" "+last_name, email, phone_number]
 
     def check_filled_registration_form(self):
         filled_data = []
